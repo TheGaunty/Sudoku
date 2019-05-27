@@ -1,4 +1,4 @@
-from prettytable import PrettyTable
+from prettytable import *
 import random
 import math
 from tkinter import *
@@ -25,11 +25,8 @@ for i in range(0,9):
         entries.append(ent)
 bottomFrame = Frame(root)
 bottomFrame.pack(side=BOTTOM)
-solve = Button(bottomFrame, text = "Solve Sudoku", command = (lambda e = entries: updateGrid(entries)))
+solve = Button(bottomFrame, text = "Solve Sudoku", command = (lambda e = entries: updateGrid(e)))
 solve.pack(side=BOTTOM)
-#Make grid
-
-
 
 ##-------Build the Gui-------##
 
@@ -70,11 +67,11 @@ def updateSquare(grid):
             squares[2][2].append(grid[i][j+6])
     return squares
     
-#Generate the random number
-def findPossible(grid, posx, posy):
-    rNum = [1,2,3,4,5,6,7,8,9]
-    cNum = [1,2,3,4,5,6,7,8,9]
-    sNum = [1,2,3,4,5,6,7,8,9]
+#Generate the possible numbers
+def findPossible(grid, ints, posx, posy):
+    rNum = ints.copy()
+    cNum = ints.copy()
+    sNum = ints.copy()
     num = []
     #Check row based on x coord
     for i in grid[posx]:
@@ -103,21 +100,33 @@ def findPossible(grid, posx, posy):
 def check(grid):
     for i in range(0,9):
         for j in range(0,9):
-            pos = findPossible(grid, i, j)
+            pos = findPossible(grid, ints, i, j)
             if len(pos) != 0:
                 return False 
     return True
 
-
+#Copy Grid
+def copyGrid(inGrid, outGrid):
+    for i in range(len(inGrid)):
+        outGrid[i] = inGrid[i]
 #Solve the sudoku
 def solveGiven(grid):
-    for k in range(0,20):
-        for i in range(0,9):
-            for j in range(0,9):
-                if grid[i][j] == 0:
-                    pos = findPossible(grid, i, j)
-                    if len(pos) == 1:
-                        grid[i][j] = pos[0]
+    tempCount = 0
+    count = countEmpty(grid)
+    for i in range(0,9):
+        for j in range(0,9):
+             if grid[i][j] == 0:
+                 pos = findPossible(grid, ints, i, j)
+                 if len(pos) == 1:
+                     grid[i][j] = pos[0]
+                 else:
+                    tempCount += 1
+    
+    if check(tempGrid) == True:
+        print("True")
+
+    grid = tempGrid.copy()    
+    return  False
 
 #Update Grid from input
 def updateGrid(entires):
@@ -125,34 +134,47 @@ def updateGrid(entires):
         text = entry.get("1.0",END)
         print(text)
 
+#count the blank spaces
+def countEmpty(grid):
+    nonZeroCount = 0
+    for i in grid:
+        for j in i:
+            if j == 0:
+                nonZeroCount += 1
+    return nonZeroCount  
+
+
 ##-------Functions-------##
 
 ##-------Main-------##
 
-grid =  [
-        [0, 0, 0, 2, 6, 0, 7, 0, 1],
-        [6, 8, 0, 0, 7, 0, 0, 9, 0],
-        [1, 9, 0, 0, 0, 4, 5, 0, 0],
-        [8, 2, 0, 1, 0, 0, 0, 4, 0],
-        [0, 0, 4, 6, 0, 2, 9, 0, 0],
-        [0, 5, 0, 0, 0, 3, 0, 2, 8],
-        [0, 0, 9, 3, 0, 0, 0, 7, 4],
-        [0, 4, 0, 0, 5, 0, 0, 3, 6],
-        [7, 0, 3, 0, 1, 8, 0, 0, 0]
+grid =[
+        [0, 3, 0, 2, 0, 0, 0, 0, 6],
+        [0, 0, 0, 0, 0, 9, 0, 0, 4],
+        [7, 6, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 5, 0, 7, 0, 0],
+        [0, 0, 0, 0, 0, 1, 8, 6, 0],
+        [0, 5, 0, 4, 8, 0, 0, 9, 0],
+        [8, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 7, 6, 0, 0, 0],
+        [0, 7, 5, 0, 0, 8, 1, 0, 0]
         ]
 
-print(grid[0])
-#Initiate table output
-        
+
 out = PrettyTable()
 out.title = ''
 out.field_names = []
 #createTable(out)
+tempGrid = grid.copy()
+print(tempGrid)
+while solveGiven(tempGrid) == False:
+    tempGrid = grid.copy()
+    print(tempGrid)
+    solveGiven(tempGrid)
+    
 
 
-
-
-#createTable(out)           
+createTable(out)           
 
 
 ##-------Main-------##
